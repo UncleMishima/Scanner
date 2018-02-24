@@ -2,9 +2,11 @@
 #include "Parser.h"
 
 
-Parser::Parser(string iStr) : inputString(iStr), INDEX(0), intNumber("empty, no equal case value")
+Parser::Parser(string iStr) : inputString(iStr), INDEX(0), 
+	intNumber("empty, no equal case value"),
+	caseFlag(false)
 {
-	printData.clear();
+	caseNumber.clear();
 	resultString.clear();
 	intValue.clear();
 	syntaxAnalyser();
@@ -19,6 +21,9 @@ inline string enumToString(Token t)
 		break;
 	case SUCCESS:
 		return " successful ";
+		break;
+	case EMPTY:
+		return " empty ";
 		break;
 	default:
 		cerr << " Wrong token " << endl;
@@ -73,10 +78,10 @@ Token Parser::lexicalAnalyser()
 		return SPACE;
 		break;
 	default:
-		if (inputString.substr(INDEX, 6) == "switch") { INDEX += 6; return SWITCH; }
-		else if (inputString.substr(INDEX, 4) == "case") { INDEX += 4; return CASE; }
-		else if (inputString.substr(INDEX, 5) == "print") { INDEX += 5; return PRINT; }
-		else if (inputString.substr(INDEX, 5) == "break") { INDEX += 5; return BREAK; }
+			 if (inputString.substr(INDEX, 6) == "switch")  { INDEX += 6; return SWITCH;  }
+		else if (inputString.substr(INDEX, 4) == "case")    { INDEX += 4; return CASE;    }
+		else if (inputString.substr(INDEX, 5) == "print")   { INDEX += 5; return PRINT;   }
+		else if (inputString.substr(INDEX, 5) == "break")   { INDEX += 5; return BREAK;   }
 		else if (inputString.substr(INDEX, 7) == "default") { INDEX += 7; return DEFAULT; }
 		else if (isNumber() != enumToString(ERROR))
 		{
@@ -88,42 +93,30 @@ Token Parser::lexicalAnalyser()
 	}
 }
 
-bool Parser::checkToken(string str)
-{
-	if (inputString.substr(INDEX, 6) == str) { return true; }
-	else if (inputString.substr(INDEX, 4) == str) { return true; }
-	else if (inputString.substr(INDEX, 5) == str) { INDEX += 5; return PRINT; }
-	else if (inputString.substr(INDEX, 5) == str) { INDEX += 5; return BREAK; }
-	else if (inputString.substr(INDEX, 7) == str) { INDEX += 7; return DEFAULT; }
-}
-
-
 void Parser::syntaxAnalyser()
 {
 	//our grammary needs to start with switch token
 	Token token = lexicalAnalyser();
-	if (token != SWITCH) cerr << "Error: syntaxAnalyser()";
+	//if (token != SWITCH) cerr << "Error: syntaxAnalyser()";
 	resultString = parseSwitch();
 }
 
 string Parser::parseSwitch()
 {
-	string defaultResult;
 	string actionResult = enumToString(SUCCESS);
 	string action2Result;
 
-	 token = lexicalAnalyser();
+	token = lexicalAnalyser();
 	if (token != LEFT_PARENTHESIS)
 	{
-		cerr << "Error: parseSwitch() - LEFT_PARENTHESIS" << endl;
+		//cerr << "Error: parseSwitch() - LEFT_PARENTHESIS" << endl;
 		return enumToString(ERROR);
 	}
 
 	token = lexicalAnalyser();
-	//cout << "INT: " << intValue << endl;
 	if (token != INT)
 	{
-		cerr << "Error: token is not INT" << endl;
+		//cerr << "Error: token is not INT" << endl;
 		return enumToString(ERROR);
 	}
 
@@ -132,14 +125,14 @@ string Parser::parseSwitch()
 	token = lexicalAnalyser();
 	if (token != RIGHT_PARENTHESIS)
 	{
-		cerr << "Error: parseSwitch() - RIGHT_PARENTHESIS" << endl;
+		//cerr << "Error: parseSwitch() - RIGHT_PARENTHESIS" << endl;
 		return enumToString(ERROR);
 	}
 
 	token = lexicalAnalyser();
 	if (token != LEFT_BRACE)
 	{
-		cerr << "Error: parseSwitch() - LEFT_BRACE" << endl;
+		//cerr << "Error: parseSwitch() - LEFT_BRACE" << endl;
 		return enumToString(ERROR);
 	}
 
@@ -150,21 +143,21 @@ string Parser::parseSwitch()
 		token = lexicalAnalyser();
 		if (actionResult != enumToString(SUCCESS))
 		{
-			cerr << "Error: parseSwitch() - parseAction()" << endl;
+			//cerr << "Error: parseSwitch() - parseAction()" << endl;
 			return enumToString(ERROR);
 		}
 	}
 
 	if (token != DEFAULT)
 	{
-		cerr << "Error: parseSwitch() - DEFAULT" << endl;
+		//cerr << "Error: parseSwitch() - DEFAULT" << endl;
 		return enumToString(ERROR);
 	}
 
 	token = lexicalAnalyser();
 	if (token != DOUBLET)
 	{
-		cerr << "Error: parseDefault() - DOUBLET" << endl;
+		//cerr << "Error: parseDefault() - DOUBLET" << endl;
 		return enumToString(ERROR);
 	}
 
@@ -173,15 +166,15 @@ string Parser::parseSwitch()
 
 	if (action2Result != enumToString(SUCCESS))
 	{
-		cerr << "Error: action2Result failed in SWITCH" << endl;
+		//cerr << "Error: action2Result failed in SWITCH" << endl;
 		return enumToString(ERROR);
 	}
 
 	token = lexicalAnalyser();
-	cout << "INDEX is: " << INDEX << endl;
+	//cout << "INDEX is: " << INDEX << endl;
 	if (token != RIGHT_BRACE)
 	{
-		cerr << "Error: parseSwitch() - RIGHT_BRACE" << endl;
+		//cerr << "Error: parseSwitch() - RIGHT_BRACE" << endl;
 		return enumToString(ERROR);
 	}
 
@@ -192,19 +185,22 @@ string Parser::parseAction()
 {
 	string action2Result;
 	token = lexicalAnalyser();
-	cout << INDEX << " " << token;
 	if (token != INT)
 	{
-		cerr << "Error: parseAction() - INT" << endl;
+		//cerr << "Error: parseAction() - INT" << endl;
 		return enumToString(ERROR);
 	}
 
-	if (intNumber == intValue) printData = intNumber;
+	if (intNumber == intValue)
+	{
+		caseNumber = intNumber;
+		caseFlag = true;
+	}
 
 	token = lexicalAnalyser();
 	if (token != DOUBLET)
 	{
-		cerr << "Error: parseAction() - DOUBLET" << endl;
+		//cerr << "Error: parseAction() - DOUBLET" << endl;
 		return enumToString(ERROR);
 	}
 
@@ -216,7 +212,7 @@ string Parser::parseAction()
 
 	if (action2Result != enumToString(SUCCESS))
 	{
-		cerr << "Error: parseAction2() inside CASE failed " << endl;
+		//cerr << "Error: parseAction2() inside CASE failed " << endl;
 		return enumToString(ERROR);
 	}
 
@@ -225,73 +221,71 @@ string Parser::parseAction()
 
 string Parser::parseAction2()
 {
-	string printResult, breakResult, switchResult;
+	string printResult, breakResult, switchResult, action2Result;
 
 	if (token == PRINT)
 	{
 		printResult = parsePrint();
 		if (printResult != enumToString(SUCCESS))
 		{
-			cerr << "Error: parse PRINT inside parseAction2()" << endl;
+			//cerr << "Error: parse PRINT inside parseAction2()" << endl;
 			return enumToString(ERROR);
 		}
+
+		token = lexicalAnalyser();
+
+		if (token == SWITCH || token == PRINT || token == BREAK)
+		{
+			action2Result = parseAction2();
+			if (action2Result != enumToString(SUCCESS))
+			{
+				//cerr << "Error: parseAction2() inside parseAction2()" << endl;
+				return enumToString(ERROR);
+			}
+		}
+		else if (token == RIGHT_BRACE) INDEX--;
+		else return enumToString(ERROR);
 	}
 
-	if (token == BREAK)
+	else if (token == BREAK)
 	{
 		breakResult = parseBreak();
 		if (breakResult != enumToString(SUCCESS))
 		{
-			cerr << "Error: parse BREAK inside parseAction2()" << endl;
+			//cerr << "Error: parse BREAK inside parseAction2()" << endl;
 			return enumToString(ERROR);
 		}
 	}
 
-	if (token == SWITCH)
+	else if (token == SWITCH)
 	{
 		switchResult = parseSwitch();
 		if (switchResult != enumToString(SUCCESS))
 		{
-			cerr << "Error: parse SWITCH inside parseAction2()" << endl;
+			//cerr << "Error: parse SWITCH inside parseAction2()" << endl;
 			return enumToString(ERROR);
 		}
 	}
-	return enumToString(SUCCESS);
-}
-
-string Parser::parseDefault()
-{
-	string printResult, breakResult;
-
-	 token = lexicalAnalyser();
-	if (token != DOUBLET)
-	{
-		cerr << "Error: parseDefault() - DOUBLET" << endl;
-		return enumToString(ERROR);
-	}
-
-	token = lexicalAnalyser();
-	if (token != PRINT)
-	{
-		cerr << "Error: parseDefault() - BREAK or PRINT" << endl;
-		return enumToString(ERROR);
-	}
-
-	printResult = parsePrint();
-	if (printResult != enumToString(SUCCESS))
-	{
-		cerr << "Error: parseDefault() - PRINT parse error";
-		return enumToString(ERROR);
-	}
 
 	return enumToString(SUCCESS);
 }
-
-
 
 string Parser::parseBreak()
 {
-	return string();
+	if (caseFlag == true)
+	{
+		printResult();
+		exit(0);
+	}
+
+	token = lexicalAnalyser();
+	if (token != SEMICOLON)
+	{
+		//cerr << "Error: parseBreak()" << endl;
+		return enumToString(ERROR);
+	}
+
+	return enumToString(SUCCESS);
 }
 
 string Parser::parsePrint()
@@ -299,15 +293,15 @@ string Parser::parsePrint()
 	token = lexicalAnalyser();
 	if (token != LEFT_PARENTHESIS)
 	{
-		cerr << "Error: parsePrint() - LEFT_PARENTHESIS" << endl;
+		//cerr << "Error: parsePrint() - LEFT_PARENTHESIS" << endl;
 		return enumToString(ERROR);
 	}
 
 	token = lexicalAnalyser();
-	cout << "INT inside PRINT: " << intValue << endl;
+	cout << "PRINT result: " << intValue << endl;
 	if (token != INT)
 	{
-		cerr << "INT error inside PRINT" << endl;
+		//cerr << "INT error inside PRINT" << endl;
 		return enumToString(ERROR);
 	}
 
@@ -325,7 +319,7 @@ string Parser::parsePrint()
 }
 
 
-void Parser::printResult()
+void Parser::printResult() const
 {
 	cout << "Input is: "  << inputString << endl
 		 << "Result is: " << resultString << endl;

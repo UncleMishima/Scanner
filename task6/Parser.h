@@ -25,7 +25,8 @@ enum Token
 	SEMICOLON,
 	DOUBLET,
 	ERROR,
-	SUCCESS
+	SUCCESS,
+	EMPTY
 };
 
 
@@ -36,8 +37,9 @@ private:
 	string resultString;
 	unsigned int INDEX;
 	string intValue;
-	string printData;
+	string caseNumber;
 	string intNumber;
+	bool caseFlag;
 	Token token;
 
 public:
@@ -45,7 +47,6 @@ public:
 	~Parser();
 
 	Token lexicalAnalyser();
-	bool checkToken(string str);
 	void syntaxAnalyser();
 
 	string parseSwitch();
@@ -54,11 +55,10 @@ public:
 	string parseAction2();
 	string parsePrint();
 
-	string parseDefault();
 	string parseBreak();
 	
 	string isNumber();
 
 
-	void printResult();
+	void printResult()const;
 };
