@@ -10,17 +10,18 @@ Parser::Parser(string iStr) : inputString(iStr), INDEX(0)
 	syntaxAnalyser();
 }
 
-
 inline string enumToString(Token t)
 {
 	switch (t)
 	{
 	case ERROR:
-		return "syntax error";
+		return " syntax error ";
 		break;
 	case SUCCESS:
-		return "successful";
+		return " successful ";
 		break;
+	default:
+		cerr << " Wrong token " << endl;
 	}
 }
 
@@ -38,7 +39,6 @@ string Parser::isNumber() {
 	intValue = number;
 	return number;
 }
-
 
 Token Parser::lexicalAnalyser()
 {
@@ -90,18 +90,16 @@ Token Parser::lexicalAnalyser()
 
 void Parser::syntaxAnalyser()
 {
+	//our grammary needs to start with switch token
 	Token token = lexicalAnalyser();
 	if (token != SWITCH) cerr << "Error: syntaxAnalyser()";
-	//INDEX += 6;
-	resultString = parseSwitch();	
+	resultString = parseSwitch();
 }
 
 string Parser::parseSwitch()
 {
-	string intResult;
 	string defaultResult;
 	string caseResult;
-	string switchResult;
 
 	Token token = lexicalAnalyser();
 	if (token != LEFT_PARENTHESIS)
@@ -109,23 +107,12 @@ string Parser::parseSwitch()
 		cerr << "Error: parseSwitch() - LEFT_PARENTHESIS" << endl;
 		return enumToString(ERROR);
 	}
-	
-	//INDEX++;
-
-	/*
-	intResult = parseInt();
-	if (intResult != enumToString(SUCCESS))
-	{
-		cerr << "Error: parseInt()" << endl;
-		return enumToString(ERROR);
-	}
-	*/
 
 	token = lexicalAnalyser();
 	//cout << "INT: " << intValue << endl;
 	if (token != INT)
 	{
-		cerr << "Error: parseInt()" << endl;
+		cerr << "Error: token is not INT" << endl;
 		return enumToString(ERROR);
 	}
 
@@ -136,8 +123,6 @@ string Parser::parseSwitch()
 		return enumToString(ERROR);
 	}
 	
-	//INDEX++;
-	
 	token = lexicalAnalyser();
 	if (token != LEFT_BRACE)
 	{
@@ -145,16 +130,12 @@ string Parser::parseSwitch()
 		return enumToString(ERROR);
 	}
 	
-	//INDEX++;
-	
 	token = lexicalAnalyser();
 	if (token != DEFAULT)
 	{
 		cerr << "Error: parseSwitch() - DEFAULT" << endl;
 		return enumToString(ERROR);
 	}
-
-	//INDEX += 7;
 
 	defaultResult = parseDefault();
 	if (defaultResult != enumToString(SUCCESS))
@@ -170,20 +151,18 @@ string Parser::parseSwitch()
 		cerr << "Error: parseSwitch() - RIGHT_BRACE" << endl;
 		return enumToString(ERROR);
 	}
-	return "Game over! You won!!!";
+
+	return enumToString(SUCCESS);
 }
 
-string Parser::parseInt()
+string Parser::parseAction()
 {
-	string number;
-	Token token = lexicalAnalyser();
-	if (token != INT) return "Error: parseInt()";
-	number = isNumber();
-	intValue = number;
-	int size = number.length();
-	INDEX += size;
+	return string();
+}
 
-	if(lexicalAnalyser() == RIGHT_PARENTHESIS) return "YES";
+string Parser::parseAction2()
+{
+	return string();
 }
 
 string Parser::parseDefault()
@@ -197,16 +176,12 @@ string Parser::parseDefault()
 		return enumToString(ERROR);
 	}
 
-	//INDEX++;
-
 	token = lexicalAnalyser();
 	if (token != PRINT)
 	{
 		cerr << "Error: parseDefault() - BREAK or PRINT" << endl;
 		return enumToString(ERROR);
 	}
-
-	//INDEX += 5;
 
 	printResult = parsePrint();
 	if (printResult != enumToString(SUCCESS))
@@ -217,6 +192,8 @@ string Parser::parseDefault()
 
 	return enumToString(SUCCESS);
 }
+
+
 
 string Parser::parseBreak()
 {
@@ -230,17 +207,12 @@ string Parser::parseCase()
 
 string Parser::parsePrint()
 {
-	string pInt;
-
 	Token token = lexicalAnalyser();
 	if (token != LEFT_PARENTHESIS)
 	{
 		cerr << "Error: parsePrint() - LEFT_PARENTHESIS" << endl;
 		return enumToString(ERROR);
 	}
-
-	//INDEX++;
-	//pInt = parseInt();
 
 	token = lexicalAnalyser();
 	cout << "INT inside PRINT: " << intValue << endl;
@@ -249,14 +221,6 @@ string Parser::parsePrint()
 		cerr << "INT error inside PRINT" << endl;
 		return enumToString(ERROR);
 	}
-/*
-	if (pInt != "YES")
-	{
-		cerr << "partseInt() inside PRINT" << endl;
-		return enumToString(ERROR);
-	}
-	*/
-	//cout << "PRINT result is: " << intValue << endl;
 
 	token = lexicalAnalyser();
 	if (token != RIGHT_PARENTHESIS)
@@ -265,12 +229,9 @@ string Parser::parsePrint()
 		return enumToString(ERROR);
 	}
 
-	//INDEX++;
-
 	token = lexicalAnalyser();
 	if (token != SEMICOLON) return "Error: parsePrint() - PRINT has not finished with SEMICOLON";
 
-	//INDEX++;
 	return enumToString(SUCCESS);
 }
 

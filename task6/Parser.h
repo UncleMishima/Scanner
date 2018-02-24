@@ -43,12 +43,17 @@ public:
 
 	Token lexicalAnalyser();
 	void syntaxAnalyser();
+
 	string parseSwitch();
-	string parseInt();
+
+	string parseAction();
+	string parseAction2();
+	string parsePrint();
+
 	string parseCase();
 	string parseDefault();
 	string parseBreak();
-	string parsePrint();
+	
 	string isNumber();
 
 
