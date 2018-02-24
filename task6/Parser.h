@@ -37,11 +37,15 @@ private:
 	unsigned int INDEX;
 	string intValue;
 	string printData;
+	string intNumber;
+	Token token;
+
 public:
 	Parser(string iStr);
 	~Parser();
 
 	Token lexicalAnalyser();
+	bool checkToken(string str);
 	void syntaxAnalyser();
 
 	string parseSwitch();
@@ -50,7 +54,6 @@ public:
 	string parseAction2();
 	string parsePrint();
 
-	string parseCase();
 	string parseDefault();
 	string parseBreak();
 	
@@ -59,4 +62,3 @@ public:
 
 	void printResult();
 };
-
