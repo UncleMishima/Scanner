@@ -140,7 +140,7 @@ string Parser::parseSwitch()
 	if (token == CASE)
 	{
 		actionResult = parseAction();
-		token = lexicalAnalyser();
+		//token = lexicalAnalyser();
 		if (actionResult != enumToString(SUCCESS))
 		{
 			//cerr << "Error: parseSwitch() - parseAction()" << endl;
@@ -161,8 +161,13 @@ string Parser::parseSwitch()
 		return enumToString(ERROR);
 	}
 
-	token = lexicalAnalyser();
-	action2Result = parseAction2();
+	
+	if (caseFlag == false)
+	{
+		token = lexicalAnalyser();
+		action2Result = parseAction2();
+	}
+	else if (caseFlag == true) action2Result = enumToString(SUCCESS);
 
 	if (action2Result != enumToString(SUCCESS))
 	{
@@ -177,6 +182,8 @@ string Parser::parseSwitch()
 		//cerr << "Error: parseSwitch() - RIGHT_BRACE" << endl;
 		return enumToString(ERROR);
 	}
+
+	//token = EMPTY;
 
 	return enumToString(SUCCESS);
 }
@@ -195,6 +202,23 @@ string Parser::parseAction()
 	{
 		caseNumber = intNumber;
 		caseFlag = true;
+	}
+	else
+	{
+		while (token != ERROR)
+		{
+			token = lexicalAnalyser();
+			if ((token == CASE) || (token == DEFAULT)) break;
+			else continue;
+		} 
+
+		if (token == CASE) parseAction();
+		else if (token == DEFAULT)
+		{
+			caseFlag = false;
+			return enumToString(SUCCESS);
+		}
+		else return enumToString(ERROR);
 	}
 
 	token = lexicalAnalyser();
