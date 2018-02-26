@@ -37,7 +37,6 @@ private:
 	string resultString;
 	unsigned int INDEX;
 	string intValue;
-	string caseNumber;
 	string intNumber;
 	bool caseFlag;
 	Token token;
@@ -50,15 +49,12 @@ public:
 	void syntaxAnalyser();
 
 	string parseSwitch();
-
 	string parseAction();
 	string parseAction2();
+
 	string parsePrint();
-
 	string parseBreak();
-	
 	string isNumber();
-
 
 	void printResult()const;
 };

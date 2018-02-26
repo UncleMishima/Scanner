@@ -6,7 +6,6 @@ Parser::Parser(string iStr) : inputString(iStr), INDEX(0),
 	intNumber("empty, no equal case value"),
 	caseFlag(false)
 {
-	caseNumber.clear();
 	resultString.clear();
 	intValue.clear();
 	syntaxAnalyser();
@@ -97,12 +96,13 @@ void Parser::syntaxAnalyser()
 {
 	//our grammary needs to start with switch token
 	Token token = lexicalAnalyser();
-	//if (token != SWITCH) cerr << "Error: syntaxAnalyser()";
+	if (token != SWITCH) cerr << enumToString(ERROR);
 	resultString = parseSwitch();
 }
 
 string Parser::parseSwitch()
 {
+	caseFlag = false;
 	string actionResult = enumToString(SUCCESS);
 	string action2Result;
 
@@ -176,7 +176,6 @@ string Parser::parseSwitch()
 	}
 
 	token = lexicalAnalyser();
-	//cout << "INDEX is: " << INDEX << endl;
 	if (token != RIGHT_BRACE)
 	{
 		//cerr << "Error: parseSwitch() - RIGHT_BRACE" << endl;
@@ -198,11 +197,7 @@ string Parser::parseAction()
 		return enumToString(ERROR);
 	}
 
-	if (intNumber == intValue)
-	{
-		caseNumber = intNumber;
-		caseFlag = true;
-	}
+	if (intNumber == intValue)	caseFlag = true;
 	else
 	{
 		while (token != ERROR)
@@ -289,6 +284,8 @@ string Parser::parseAction2()
 			//cerr << "Error: parse SWITCH inside parseAction2()" << endl;
 			return enumToString(ERROR);
 		}
+		token = lexicalAnalyser();
+		caseFlag = true;
 	}
 
 	return enumToString(SUCCESS);
@@ -345,7 +342,7 @@ string Parser::parsePrint()
 
 void Parser::printResult() const
 {
-	cout << "Input is: "  << inputString << endl
+	cout << "\nInput is: "  << inputString << endl
 		 << "Result is: " << resultString << endl;
 }
 
