@@ -38,7 +38,8 @@ private:
 	unsigned int INDEX;
 	string intValue;
 	string intNumber;
-	bool caseFlag;
+	//bool caseFlag;
+	//bool defaultFlag;
 	Token token;
 
 public:
@@ -48,12 +49,12 @@ public:
 	Token lexicalAnalyser();
 	void syntaxAnalyser();
 
-	string parseSwitch();
-	string parseAction();
-	string parseAction2();
+	string parseSwitch(bool caseFlag, bool defaultFlag);
+	string parseAction(bool& caseFlag, bool& defaultFlag);
+	string parseAction2(bool caseFlag, bool defaultFlag);
 
-	string parsePrint();
-	string parseBreak();
+	string parsePrint(bool flag);
+	string parseBreak(bool caseFlag);
 	string isNumber();
 
 	void printResult()const;
